@@ -1,0 +1,7 @@
+Obtém todos os urls disponíveis no banco
+---
+responses:
+  200:
+    description: URLs encontradas
+  404:
+    description: URLs não encontradas

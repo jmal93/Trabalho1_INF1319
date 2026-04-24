@@ -1,0 +1,13 @@
+Obtém os dados de um link encurtado através do seu código
+---
+parameters:
+  - name: short_code
+    in: path
+    type: string
+    required: true
+    description: O código curto da URL (ex AbCdEf)
+responses:
+  200:
+    description: Detalhes encontrados
+  404:
+    description: URL não encontrada

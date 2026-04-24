@@ -1,32 +1,14 @@
-from flask import Blueprint, request, jsonify
+from flasgger import swag_from
+from flask import Blueprint, jsonify, request
+
 from app.models.url import URL
 from app.services.shortener_service import create_short_url, get_url_by_short_code
 
 short_urls_bp = Blueprint("short_urls", __name__)
 
 @short_urls_bp.route('/api/v3/short-urls', methods=['POST'])
+@swag_from('encurtar.yml')
 def encurtar():
-  """Cria um novo link encurtado
-  ---
-  parameters:
-    - name: body
-      in: body
-      required: true
-      schema:
-        type: object
-        properties:
-          url:
-            type: string
-            example: "https://google.com"
-          owner-id:
-            type: string
-            example: "roger"
-  responses:
-    201:
-      description: Link criado com sucesso
-    400:
-      description: Dados inválidos
-  """
   data = request.get_json() or {}
   original_url = data.get("url")
   owner_id = data.get("owner-id")
@@ -42,21 +24,8 @@ def encurtar():
 
 
 @short_urls_bp.route('/api/v3/short-urls/<short_code>', methods=['GET'])
+@swag_from('get_short_url.yml')
 def get_short_url(short_code):
-  """Obtém os dados de um link encurtado através do seu código
-  ---
-  parameters:
-    - name: short_code
-      in: path
-      type: string
-      required: true
-      description: O código curto da URL (ex AbCdEf)
-  responses:
-    200:
-      description: Detalhes encontrados
-    404:
-      description: URL não encontrada
-  """
   url_data = get_url_by_short_code(short_code)
 
   if not url_data:
@@ -71,21 +40,8 @@ def get_short_url(short_code):
   }), 200
 
 @short_urls_bp.route('/api/v3/short-urls', methods=['GET'])
+@swag_from('get_all_short_urls.yml')
 def get_all_short_urls():
-  """Obtém todos os urls disponíveis no banco
-  ---
-  parameters:
-    - name: short_code
-      in: path
-      type: string
-      required: true
-      description: O código curto da URL (ex AbCdEf)
-  responses:
-    200:
-      description: Detalhes encontrados
-    404:
-      description: URL não encontrada
-  """
   pagination = URL.query.paginate(page=1, per_page=10, error_out=False)
   all_short_urls = pagination.items
 
