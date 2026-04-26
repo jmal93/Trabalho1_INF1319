@@ -26,3 +26,14 @@ def _generate_unique_code():
         exists = get_url_by_short_code(short_code=code)
         if not exists:
             return code
+
+def delete_url(short_code: str) -> bool:
+    url = get_url_by_short_code(short_code=short_code)
+
+    if not url:
+        return False
+
+    db.session.delete(url)
+    db.session.commit()
+    
+    return True

@@ -1,9 +1,8 @@
 from flasgger import swag_from
 from flask import Blueprint, jsonify, request
-from flask_sqlalchemy import pagination
 
 from app.models.url import URL
-from app.services.shortener_service import create_short_url, get_url_by_short_code
+from app.services.shortener_service import create_short_url, delete_url, get_url_by_short_code
 
 short_urls_bp = Blueprint("short_urls", __name__)
 
@@ -97,3 +96,12 @@ def get_user_short_urls(owner_id):
     "total": pagination.total,
     "pages": pagination.pages
   }), 200
+
+@short_urls_bp.route('/api/v3/short_urls/<short_code>', methods=['DELETE'])
+def delete_short_url(short_code):
+  success = delete_url(short_code=short_code)
+  
+  if not success:
+    return jsonify({"error": "URL não encontrada"}), 404
+
+  return '', 204
