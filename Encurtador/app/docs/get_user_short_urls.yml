@@ -1,6 +1,11 @@
-Lista todas as URLs cadastradas (admin)
+Lista URLs de um usuário específico
 ---
 parameters:
+  - name: owner_id
+    in: path
+    type: string
+    required: true
+    description: ID do usuário dono das URLs
   - name: page
     in: query
     type: integer
@@ -15,7 +20,7 @@ parameters:
     description: Quantidade de itens por página
 responses:
   200:
-    description: Lista de URLs com paginação
+    description: Lista de URLs do usuário com paginação
     schema:
       type: object
       properties:
@@ -44,3 +49,5 @@ responses:
           type: integer
         pages:
           type: integer
+  404:
+    description: Nenhuma URL encontrada

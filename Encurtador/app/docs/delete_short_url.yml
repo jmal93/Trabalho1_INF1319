@@ -1,0 +1,13 @@
+Remove uma URL encurtada
+---
+parameters:
+  - name: short_code
+    in: path
+    type: string
+    required: true
+    description: Código curto da URL a ser removida
+responses:
+  204:
+    description: URL removida com sucesso
+  404:
+    description: URL não encontrada

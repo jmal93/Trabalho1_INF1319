@@ -69,6 +69,7 @@ def get_all_short_urls():
   }), 200
 
 @short_urls_bp.route('/api/v3/users/<owner_id>/short-urls', methods=['GET'])
+@swag_from('get_user_short_urls.yml')
 def get_user_short_urls(owner_id):
   page: int = request.args.get('page', 1, type=int)
   per_page: int = request.args.get('per_page', 10, type=int)
@@ -98,6 +99,7 @@ def get_user_short_urls(owner_id):
   }), 200
 
 @short_urls_bp.route('/api/v3/short_urls/<short_code>', methods=['DELETE'])
+@swag_from('delete_short_url.yml')
 def delete_short_url(short_code):
   success = delete_url(short_code=short_code)
   
