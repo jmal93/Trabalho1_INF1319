@@ -1,5 +1,6 @@
 from flasgger import swag_from
 from flask import Blueprint, jsonify, request
+from flask_sqlalchemy import pagination
 
 from app.models.url import URL
 from app.services.shortener_service import create_short_url, get_url_by_short_code
@@ -42,19 +43,57 @@ def get_short_url(short_code):
 @short_urls_bp.route('/api/v3/short-urls', methods=['GET'])
 @swag_from('get_all_short_urls.yml')
 def get_all_short_urls():
+  page: int = request.args.get('page', 1, type=int)
+  per_page: int = request.args.get('per_page', 10, type=int)
+
   pagination = URL.query.paginate(page=1, per_page=10, error_out=False)
-  all_short_urls = pagination.items
 
   result = []
-  for url in all_short_urls:
+  for url in pagination.items:
     result.append(
       {
         "original_url": url.original_url,
-        "short_url": url.short_code,
+        "short_code": url.short_code,
+        "short_url": f"http://localhost:5000/{url.short_code}",
         "owner_id": url.owner_id,
         "created_at": url.created_at.isoformat() if url.created_at else None,
         "hits": url.hits
       }
     )
 
-  return result
+  return jsonify({
+    "items": result,
+    "page": page,
+    "per_page": per_page,
+    "total": pagination.total,
+    "pages": pagination.pages
+  }), 200
+
+@short_urls_bp.route('/api/v3/users/<owner_id>/short-urls', methods=['GET'])
+def get_user_short_urls(owner_id):
+  page: int = request.args.get('page', 1, type=int)
+  per_page: int = request.args.get('per_page', 10, type=int)
+
+  pagination = URL.query.filter_by(owner_id=owner_id)\
+    .paginate(page=page, per_page=per_page, error_out=False)
+
+  result = []
+  for url in pagination.items:
+    result.append(
+      {
+        "original_url": url.original_url,
+        "short_code": url.short_code,
+        "short_url": f"http://localhost:5000/{url.short_code}",
+        "owner_id": url.owner_id,
+        "created_at": url.created_at.isoformat() if url.created_at else None,
+        "hits": url.hits
+      }
+    )
+
+  return jsonify({
+    "items": result,
+    "page": page,
+    "per_page": per_page,
+    "total": pagination.total,
+    "pages": pagination.pages
+  }), 200
